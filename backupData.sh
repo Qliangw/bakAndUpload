@@ -114,7 +114,7 @@ version()
 
 # rclone copy -v "${BAK_ROOT_DIR}/bak_appdata_`date '+%F'`.tar.gz" aliyunwebdav-zx:/webdav/backup/unraid/$(date +"%m-%d")/ > "/mnt/disk1/rclone-tr.log" 2>&1
 
-rclone copy -v "${BAK_ROOT_DIR}/bak_appdata_`date '+%F'`.tar.gz" ${RCLONE_CONF}:${NET_DIR}/$(date +"%m-%d")/ | tee -a "${LOG_DIR}/rclone_`date '+%F'`.log" 2>&1
+
 
 # ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
 
@@ -126,6 +126,7 @@ if [[ "$1" == "-m" || "$1" == "manual" ]]; then
 	bakComp
 elif [[ "$1" == "-a" || "$1" == "auto" ]]; then
 	bakComp
+	rclone copy -v "${BAK_ROOT_DIR}/bak_appdata_`date '+%F'`.tar.gz" ${RCLONE_CONF}:${NET_DIR}/$(date +"%m-%d")/ | tee -a "${LOG_DIR}/rclone_`date '+%F'`.log" 2>&1
 elif [[ "$1" == "-h" || "$1" == "--help" ]]; then
 	displayHelp
 elif [[ "$1" == "-v" || "$1" == "--version" ]]; then
