@@ -125,7 +125,7 @@ if [[ "$1" == "-m" || "$1" == "manual" ]]; then
 elif [[ "$1" == "-a" || "$1" == "auto" ]]; then
 	bakComp
 	logOutputSplit 10 '-'
-	rclone copy -v -P "${BAK_ROOT_DIR}/bak_appdata_"${DATA_FILE_NAME}".tar.gz" "${RCLONE_CONF}":"${NET_DIR}"/"$(date +'%m-%d')" >> "${LOG_DIR}/backupData_"${DATA_FILE_NAME}".log" 2>&1
+	rclone copy -v "${BAK_ROOT_DIR}/bak_appdata_"${DATA_FILE_NAME}".tar.gz" "${RCLONE_CONF}":"${NET_DIR}"/"$(date +'%m-%d')" >> "${LOG_DIR}/backupData_"${DATA_FILE_NAME}".log" 2>&1
 elif [[ "$1" == "-h" || "$1" == "--help" ]]; then
 	displayHelp
 elif [[ "$1" == "-v" || "$1" == "--version" ]]; then
