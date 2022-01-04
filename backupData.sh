@@ -13,13 +13,13 @@ DATA_FILE_NAME=$(date '+%F')
 function logOutput()
 {
 	LOG_HEAD_INFO="[$(date '+%F %H:%M:%S.%3N')]"
-	echo "$LOG_HEAD_INFO" "$1" | tee -a "${LOG_DIR}/rclone_"${DATA_FILE_NAME}".log" 2>&1 
+	echo "$LOG_HEAD_INFO" "$1" | tee -a "${LOG_DIR}/backupData_"${DATA_FILE_NAME}".log" 2>&1 
 }
 
 function logOutputSplit()
 {
 	printf -v str "%${1}s" ""
-	echo "${str// /$2}" | tee -a "${LOG_DIR}/rclone_"${DATA_FILE_NAME}".log" 2>&1 
+	echo "${str// /$2}" | tee -a "${LOG_DIR}/backupData_"${DATA_FILE_NAME}".log" 2>&1 
 }
 
 function actionBackup()
@@ -124,7 +124,8 @@ if [[ "$1" == "-m" || "$1" == "manual" ]]; then
 	bakComp
 elif [[ "$1" == "-a" || "$1" == "auto" ]]; then
 	bakComp
-	rclone copy -v "${BAK_ROOT_DIR}/bak_appdata_"${DATA_FILE_NAME}".tar.gz" "${RCLONE_CONF}":"${NET_DIR}"/"$(date +'%m-%d')"/ | tee -a "${LOG_DIR}/rclone_"${DATA_FILE_NAME}".log" 2>&1
+	logOutputSplit 10 '-'
+	rclone copy -v -P "${BAK_ROOT_DIR}/bak_appdata_"${DATA_FILE_NAME}".tar.gz" "${RCLONE_CONF}":"${NET_DIR}"/"$(date +'%m-%d')" >> "${LOG_DIR}/backupData_"${DATA_FILE_NAME}".log" 2>&1
 elif [[ "$1" == "-h" || "$1" == "--help" ]]; then
 	displayHelp
 elif [[ "$1" == "-v" || "$1" == "--version" ]]; then
