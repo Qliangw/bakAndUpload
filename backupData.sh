@@ -133,6 +133,7 @@ elif [[ "$1" == "-a" || "$1" == "auto" ]]; then
 	bak_comp
 	log_output_split 10 '-'
 	rclone copy -v "${BAK_ROOT_DIR}/bak_appdata_"${DATA_FILE_NAME}".tar.gz" "${RCLONE_CONF}":"${NET_DIR}"/"$(date +'%m-%d')" >> "${LOG_DIR}/backupData_"${DATA_FILE_NAME}".log" 2>&1
+	push_wx
 elif [[ "$1" == "-h" || "$1" == "--help" ]]; then
 	display_help
 elif [[ "$1" == "-v" || "$1" == "--version" ]]; then
