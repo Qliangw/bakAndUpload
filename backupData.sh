@@ -84,11 +84,11 @@ function bak_comp()
 {
 	cd "${BASE_ROOT}" || exit
 	source ./user.conf
-	log_output_split 16 '*'
+	# log_output_split 16 '*'
 	log_output "导入用户配置"
 	log_output "运行脚本： $0"
 	action_shell
-	log_output_split 16 '='
+	# log_output_split 16 '='
 	echo -e | tee -a "${LOG_DIR}/backupData_"${DATA_FILE_NAME}".log" 2>&1
 }
 
@@ -131,7 +131,7 @@ if [[ "$1" == "-m" || "$1" == "manual" ]]; then
 	bak_comp
 elif [[ "$1" == "-a" || "$1" == "auto" ]]; then
 	bak_comp
-	log_output_split 10 '-'
+	# log_output_split 10 '-'
 	rclone copy -v "${BAK_ROOT_DIR}/bak_appdata_"${DATA_FILE_NAME}".tar.gz" "${RCLONE_CONF}":"${NET_DIR}"/"$(date +'%m-%d')" >> "${LOG_DIR}/backupData_"${DATA_FILE_NAME}".log" 2>&1
 	push_wx
 elif [[ "$1" == "-h" || "$1" == "--help" ]]; then
