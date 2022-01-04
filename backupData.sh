@@ -12,9 +12,9 @@ DATA_FILE_NAME=$(date '+%F')
 # ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 function log_output()
 {
-	#LOG_HEAD_INFO="[$(date '+%F %H:%M:%S.%3N')]"
-	LOG_HEAD_INFO="[$(date '+%H:%M:%S.%3N')]"
-	echo "$LOG_HEAD_INFO" "$1" | tee -a "${LOG_DIR}/backupData_"${DATA_FILE_NAME}".log" 2>&1 
+	LOG_HEAD_INFO="[$(date '+%F %H:%M:%S.%3N')]"
+	#LOG_HEAD_INFO="[$(date '+%H:%M:%S.%3N')]"
+	echo -e "$LOG_HEAD_INFO" "$1" | tee -a "${LOG_DIR}/backupData_"${DATA_FILE_NAME}".log" 2>&1 
 }
 
 function log_output_split()
@@ -96,7 +96,7 @@ function push_wx()
 {
 	# cd "${BASE_ROOT}" || exit
 	PUSH_MSG=$(cat "${LOG_DIR}/backupData_"${DATA_FILE_NAME}".log")
-	bash "${BASE_ROOT}"/push.sh "${PUSH_MSG}"
+	bash "${BASE_ROOT}"/push.sh "${PUSH_MSG}" "待添加\n内容为rclone上传日志"
 }
 
 # 帮助文档
