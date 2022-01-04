@@ -9,7 +9,7 @@ KEY=$(echo ${RET} | jq -r .access_token)
 if [[ ${MEDIA_ID} == "" ]]; then
     cat>./tmp<<EOF
 {
-    "touser" : "@all",
+    "touser" : "${TOUSER}",
     "msgtype" : "text",
     "agentid" : "${AGENTID}",
     "text" :
@@ -21,7 +21,7 @@ EOF
 	else
 		cat>./tmp<<EOF
 {
-   "touser" : "@all",
+   "touser" : "${TOUSER}",
    "msgtype" : "mpnews",
    "agentid" : "${AGENTID}",
    "mpnews" : {
@@ -29,7 +29,7 @@ EOF
            {
                "title": "数据备份通知", 
                "thumb_media_id": "${MEDIA_ID}",
-               "author": "TEST",
+               "author": "备份通知",
                "content_source_url": "URL",
                "content": "$1",
                "digest": "$2"
