@@ -54,12 +54,11 @@ function compFile()
 		| dd of=bak_appdata_"$(date +'%Y-%m-%d')".tar.gz \
 		| tee -a "${LOG_DIR}/rclone_"${DATA_FILE_NAME}".log" 2>&1
 	logOutput "加密压缩完成！" 
-
 }
 
 function actionShell()
 {
-	if [ -f "${BAK_ROOT_DIR}/bak_appdata_'${DATA_FILE_NAME}'.tar.gz" ];then
+	if [ -f "${BAK_ROOT_DIR}/bak_appdata_"${DATA_FILE_NAME}".tar.gz" ];then
 		logOutput "今日已备份！" 
 	else
 		if [ -d "${BAK_ROOT_DIR}/bak_appdata_"${DATA_FILE_NAME}"" ];then
@@ -68,7 +67,6 @@ function actionShell()
 		    createDir
 		    actionBackup
 		fi
-
 		compFile
 	fi
 }
