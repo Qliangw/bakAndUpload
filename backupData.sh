@@ -2,7 +2,7 @@
 
 # *****************1. 配置*****************
 # ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
-BASE_ROOT=$(cd "$(dirname "$0")";pwd)
+BASE_ROOT=$(cd "$(dirname "$0")" || exit;pwd)
 #BAK_DIR="${BAK_ROOT_DIR}/bak_appdata_$(DATA_FILE_NAME)"
 DATA_FILE_NAME=date '+%F'
 # ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
@@ -12,8 +12,8 @@ DATA_FILE_NAME=date '+%F'
 # ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 function logOutput()
 {
-	LOG_HEAD_INFO="["`date '+%F %H:%M:%S.%3N'`"]"
-	echo $LOG_HEAD_INFO $1 | tee -a "${LOG_DIR}/rclone_$(DATA_FILE_NAME).log" 2>&1 
+	LOG_HEAD_INFO="[$(date '+%F %H:%M:%S.%3N')]"
+	echo "$LOG_HEAD_INFO" $1 | tee -a "${LOG_DIR}/rclone_$(DATA_FILE_NAME).log" 2>&1 
 }
 
 function logOutputSplit()
@@ -26,21 +26,21 @@ function actionBackup()
 {
 	cd "${DATA_DIR}" || exit
 	logOutput "开始备份appdata数据..." 
-	cp -r `ls "${DATA_DIR}" | grep -v "${IGNORE_DIR}" | xargs` "${BAK_DIR}"
+	cp -r $(ls "${DATA_DIR}" | grep -v "${IGNORE_DIR}" | xargs) "${BAK_DIR}"
 	logOutput "备份appdata数据完成！" 
 }
 
 function createDir()
 {
 	logOutput "本次备份目录不存在" 
-    mkdir ${BAK_ROOT_DIR}/bak_appdata_$(DATA_FILE_NAME)
+    mkdir "${BAK_ROOT_DIR}"/bak_appdata_$(DATA_FILE_NAME)
     logOutput "创建bak_appdata目录" 
 }
 
 function compFile()
 {
 	# 进入备份目录的上一级目录
-	cd ${BAK_ROOT_DIR}
+	cd "${BAK_ROOT_DIR}" || exit
 	logOutput "开始压缩appdata备份数据..." 
 	
 	# zip 压缩
@@ -127,7 +127,7 @@ if [[ "$1" == "-m" || "$1" == "manual" ]]; then
 	bakComp
 elif [[ "$1" == "-a" || "$1" == "auto" ]]; then
 	bakComp
-	rclone copy -v "${BAK_ROOT_DIR}/bak_appdata_$(DATA_FILE_NAME).tar.gz" ${RCLONE_CONF}:${NET_DIR}/$(date +"%m-%d")/ | tee -a "${LOG_DIR}/rclone_$(DATA_FILE_NAME).log" 2>&1
+	rclone copy -v "${BAK_ROOT_DIR}/bak_appdata_$(DATA_FILE_NAME).tar.gz" "${RCLONE_CONF}":"${NET_DIR}"/$(date +"%m-%d")/ | tee -a "${LOG_DIR}/rclone_$(DATA_FILE_NAME).log" 2>&1
 elif [[ "$1" == "-h" || "$1" == "--help" ]]; then
 	displayHelp
 elif [[ "$1" == "-v" || "$1" == "--version" ]]; then
