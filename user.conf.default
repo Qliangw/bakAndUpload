@@ -11,7 +11,7 @@ export TAR_PASSWD=abcd1234
 
 # /mnt/user/optfiles 这里要更换为你新建的备份文件
 export BAK_ROOT_DIR=/mnt/user/optfiles/backup
-export BAK_DIR="$BAK_ROOT_DIR/bak_appdata_`date '+%F'`"
+export BAK_DIR="$BAK_ROOT_DIR/bak_appdata_$(date '+%F')"
 
 export RCLONE_CONF=aliyunwebdav
 export NET_DIR=/webdav/backup/unraid
