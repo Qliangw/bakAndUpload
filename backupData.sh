@@ -10,38 +10,38 @@ DATA_FILE_NAME=$(date '+%F')
 
 # *****************2. 函数*****************
 # ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
-function logOutput()
+function log_output()
 {
 	LOG_HEAD_INFO="[$(date '+%F %H:%M:%S.%3N')]"
 	echo "$LOG_HEAD_INFO" "$1" | tee -a "${LOG_DIR}/backupData_"${DATA_FILE_NAME}".log" 2>&1 
 }
 
-function logOutputSplit()
+function log_output_split()
 {
 	printf -v str "%${1}s" ""
 	echo "${str// /$2}" | tee -a "${LOG_DIR}/backupData_"${DATA_FILE_NAME}".log" 2>&1 
 }
 
-function actionBackup()
+function action_backup()
 {
 	cd "${DATA_DIR}" || exit
-	logOutput "开始备份appdata数据..." 
+	log_output "开始备份appdata数据..." 
 	cp -r $(ls "${DATA_DIR}" | grep -v "${IGNORE_DIR}" | xargs) "${BAK_DIR}"
-	logOutput "备份appdata数据完成！" 
+	log_output "备份appdata数据完成！" 
 }
 
-function createDir()
+function create_dir()
 {
-	logOutput "本次备份目录不存在" 
+	log_output "本次备份目录不存在" 
     mkdir "${BAK_ROOT_DIR}"/bak_appdata_"${DATA_FILE_NAME}"
-    logOutput "创建bak_appdata目录" 
+    log_output "创建bak_appdata目录" 
 }
 
-function compFile()
+function comp_file()
 {
 	# 进入备份目录的上一级目录
 	cd "${BAK_ROOT_DIR}" || exit
-	logOutput "开始压缩appdata备份数据..." 
+	log_output "开始压缩appdata备份数据..." 
 	
 	# zip 压缩
 	# zip -rmP password unraid_appdata_bak_$(date +"%Y-%m-%d").zip "${BAK_DIR}"
@@ -53,47 +53,53 @@ function compFile()
 		| openssl des3 -salt -k password \
 		| dd of=bak_appdata_"$(date +'%Y-%m-%d')".tar.gz \
 		| tee -a "${LOG_DIR}/rclone_"${DATA_FILE_NAME}".log" 2>&1
-	logOutput "加密压缩完成！" 
+	log_output "加密压缩完成！" 
 }
 
-function actionShell()
+function action_shell()
 {
 	if [ -f "${BAK_ROOT_DIR}/bak_appdata_"${DATA_FILE_NAME}".tar.gz" ];then
-		logOutput "今日已备份！" 
+		log_output "今日已备份！" 
 	else
 		if [ -d "${BAK_ROOT_DIR}/bak_appdata_"${DATA_FILE_NAME}"" ];then
-		    logOutput "本次备份目录已存在" 
+		    log_output "本次备份目录已存在" 
 		else
-		    createDir
-		    actionBackup
+		    create_dir
+		    action_backup
 		fi
-		compFile
+		comp_file
 	fi
 }
 
-function checkRclone()
+function check_rclone()
 {
 	if ! [ -x "$(command -v rclone)" ];then
-		logOutput "rclone未安装"
+		log_output "rclone未安装"
 		exit 1
 	fi
 }
 
-function bakComp()
+function bak_comp()
 {
 	cd "${BASE_ROOT}" || exit
 	source ./user.conf
-	logOutputSplit 64 '*'
-	logOutput "导入用户配置"
-	logOutput "运行脚本： $0"
-	actionShell
-	logOutputSplit 64 '='
-	echo -e | tee -a "${LOG_DIR}/rclone_'${DATA_FILE_NAME}'.log" 2>&1
+	log_output_split 64 '*'
+	log_output "导入用户配置"
+	log_output "运行脚本： $0"
+	action_shell
+	log_output_split 64 '='
+	echo -e | tee -a "${LOG_DIR}/rclone_"${DATA_FILE_NAME}".log" 2>&1
 }
 
+function push_wx()
+{
+	cd "${BASE_ROOT}" || exit
+	bash ./push.sh "测试通知" 
+
+}
 
 # 帮助文档
-displayHelp()
+display_help()
 {
 	echo "Usage: $0 [option...] {manual|auto}" >&2
 	echo "   -m, manual              手动模式"
@@ -121,15 +127,17 @@ version()
 # ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 
 if [[ "$1" == "-m" || "$1" == "manual" ]]; then
-	bakComp
+	bak_comp
 elif [[ "$1" == "-a" || "$1" == "auto" ]]; then
-	bakComp
-	logOutputSplit 10 '-'
+	bak_comp
+	log_output_split 10 '-'
 	rclone copy -v "${BAK_ROOT_DIR}/bak_appdata_"${DATA_FILE_NAME}".tar.gz" "${RCLONE_CONF}":"${NET_DIR}"/"$(date +'%m-%d')" >> "${LOG_DIR}/backupData_"${DATA_FILE_NAME}".log" 2>&1
 elif [[ "$1" == "-h" || "$1" == "--help" ]]; then
-	displayHelp
+	display_help
 elif [[ "$1" == "-v" || "$1" == "--version" ]]; then
 	version
+elif [[ "$1" == "test" ]]; then
+	push_wx
 else
 	echo "请输出-h 查看正确命令！"
 fi
