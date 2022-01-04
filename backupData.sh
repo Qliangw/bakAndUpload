@@ -12,7 +12,8 @@ DATA_FILE_NAME=$(date '+%F')
 # ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 function log_output()
 {
-	LOG_HEAD_INFO="[$(date '+%F %H:%M:%S.%3N')]"
+	#LOG_HEAD_INFO="[$(date '+%F %H:%M:%S.%3N')]"
+	LOG_HEAD_INFO="[$(date '+%H:%M:%S.%3N')]"
 	echo "$LOG_HEAD_INFO" "$1" | tee -a "${LOG_DIR}/backupData_"${DATA_FILE_NAME}".log" 2>&1 
 }
 
@@ -83,19 +84,19 @@ function bak_comp()
 {
 	cd "${BASE_ROOT}" || exit
 	source ./user.conf
-	log_output_split 64 '*'
+	log_output_split 16 '*'
 	log_output "导入用户配置"
 	log_output "运行脚本： $0"
 	action_shell
-	log_output_split 64 '='
+	log_output_split 16 '='
 	echo -e | tee -a "${LOG_DIR}/rclone_"${DATA_FILE_NAME}".log" 2>&1
 }
 
 function push_wx()
 {
-	cd "${BASE_ROOT}" || exit
-	bash ./push.sh "测试通知" 
-
+	# cd "${BASE_ROOT}" || exit
+	PUSH_MSG=$(cat "${LOG_DIR}/rclone_"${DATA_FILE_NAME}".log")
+	bash "${BASE_ROOT}"/push.sh "${PUSH_MSG}"
 }
 
 # 帮助文档

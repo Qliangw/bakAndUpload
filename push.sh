@@ -21,15 +21,6 @@ EOF
 	else
 		cat>./tmp<<EOF
 {
-    "touser" : "@all",
-    "msgtype" : "text",
-    "agentid" : "${AGENTID}",
-    "text" :
-    {
-        "content" : "$1"
-    }
-}
-{
    "touser" : "@all",
    "msgtype" : "mpnews",
    "agentid" : "${AGENTID}",
