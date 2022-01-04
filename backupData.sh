@@ -3,7 +3,8 @@
 # *****************1. 配置*****************
 # ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 BASE_ROOT=$(cd "$(dirname "$0")";pwd)
-#BAK_DIR="${BAK_ROOT_DIR}/bak_appdata_`date '+%F'`"
+#BAK_DIR="${BAK_ROOT_DIR}/bak_appdata_$(DATA_FILE_NAME)"
+DATA_FILE_NAME=date '+%F'
 # ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
 
 
@@ -12,27 +13,27 @@ BASE_ROOT=$(cd "$(dirname "$0")";pwd)
 function logOutput()
 {
 	LOG_HEAD_INFO="["`date '+%F %H:%M:%S.%3N'`"]"
-	echo $LOG_HEAD_INFO $1 | tee -a "${LOG_DIR}/rclone_`date '+%F'`.log" 2>&1 
+	echo $LOG_HEAD_INFO $1 | tee -a "${LOG_DIR}/rclone_$(DATA_FILE_NAME).log" 2>&1 
 }
 
 function logOutputSplit()
 {
 	printf -v str "%${1}s" ""
-	echo "${str// /$2}" | tee -a "${LOG_DIR}/rclone_`date '+%F'`.log" 2>&1 
+	echo "${str// /$2}" | tee -a "${LOG_DIR}/rclone_$(DATA_FILE_NAME).log" 2>&1 
 }
 
 function actionBackup()
 {
-	cd ${DATA_DIR}
+	cd "${DATA_DIR}" || exit
 	logOutput "开始备份appdata数据..." 
-	cp -r `ls ${DATA_DIR} | grep -v ${IGNORE_DIR} | xargs` ${BAK_DIR}
+	cp -r `ls "${DATA_DIR}" | grep -v "${IGNORE_DIR}" | xargs` "${BAK_DIR}"
 	logOutput "备份appdata数据完成！" 
 }
 
 function createDir()
 {
 	logOutput "本次备份目录不存在" 
-    mkdir ${BAK_ROOT_DIR}/bak_appdata_`date '+%F'`
+    mkdir ${BAK_ROOT_DIR}/bak_appdata_$(DATA_FILE_NAME)
     logOutput "创建bak_appdata目录" 
 }
 
@@ -43,25 +44,25 @@ function compFile()
 	logOutput "开始压缩appdata备份数据..." 
 	
 	# zip 压缩
-	# zip -rmP password unraid_appdata_bak_$(date +"%Y-%m-%d").zip ${BAK_DIR}
+	# zip -rmP password unraid_appdata_bak_$(date +"%Y-%m-%d").zip "${BAK_DIR}"
 
 	# tar -zc 使用gzip压缩
 	# 解压命令：openssl des3 -d -k password -salt -in files.tar.gz | tar xzvf -
 	# 压缩 删除原文件 加密 以日期命名
-	tar -czf - ${BAK_DIR} --remove-files \
+	tar -czf - "${BAK_DIR}" --remove-files \
 		| openssl des3 -salt -k password \
 		| dd of=bak_appdata_$(date +"%Y-%m-%d").tar.gz \
-		| tee -a "${LOG_DIR}/rclone_`date '+%F'`.log" 2>&1
+		| tee -a "${LOG_DIR}/rclone_$(DATA_FILE_NAME).log" 2>&1
 	logOutput "加密压缩完成！" 
 
 }
 
 function actionShell()
 {
-	if [ -f "${BAK_ROOT_DIR}/bak_appdata_`date '+%F'`.tar.gz" ];then
+	if [ -f "${BAK_ROOT_DIR}/bak_appdata_$(DATA_FILE_NAME).tar.gz" ];then
 		logOutput "今日已备份！" 
 	else
-		if [ -d "${BAK_ROOT_DIR}/bak_appdata_`date '+%F'`" ];then
+		if [ -d "${BAK_ROOT_DIR}/bak_appdata_$(DATA_FILE_NAME)" ];then
 		    logOutput "本次备份目录已存在" 
 		else
 		    createDir
@@ -82,14 +83,14 @@ function checkRclone()
 
 function bakComp()
 {
-	logOutputSplit 64 \*
-	cd ${BASE_ROOT}
-	source user.conf
+	logOutputSplit 64 '*'
+	cd "${BASE_ROOT}" || exit
+	source ./user.conf
 	logOutput "导入用户配置"
 	logOutput "运行脚本： $0"
 	actionShell
-	logOutputSplit 64 \=
-	echo -e | tee -a "${LOG_DIR}/rclone_`date '+%F'`.log" 2>&1 
+	logOutputSplit 64 '='
+	echo -e | tee -a "${LOG_DIR}/rclone_$(DATA_FILE_NAME).log" 2>&1 
 
 }
 
@@ -112,7 +113,7 @@ version()
 	echo -e "version:0.0.1"\\nupdate time:2021-12-31
 }
 
-# rclone copy -v "${BAK_ROOT_DIR}/bak_appdata_`date '+%F'`.tar.gz" aliyunwebdav-zx:/webdav/backup/unraid/$(date +"%m-%d")/ > "/mnt/disk1/rclone-tr.log" 2>&1
+# rclone copy -v "${BAK_ROOT_DIR}/bak_appdata_$(DATA_FILE_NAME).tar.gz" aliyunwebdav-zx:/webdav/backup/unraid/$(date +"%m-%d")/ > "/mnt/disk1/rclone-tr.log" 2>&1
 
 
 
@@ -126,7 +127,7 @@ if [[ "$1" == "-m" || "$1" == "manual" ]]; then
 	bakComp
 elif [[ "$1" == "-a" || "$1" == "auto" ]]; then
 	bakComp
-	rclone copy -v "${BAK_ROOT_DIR}/bak_appdata_`date '+%F'`.tar.gz" ${RCLONE_CONF}:${NET_DIR}/$(date +"%m-%d")/ | tee -a "${LOG_DIR}/rclone_`date '+%F'`.log" 2>&1
+	rclone copy -v "${BAK_ROOT_DIR}/bak_appdata_$(DATA_FILE_NAME).tar.gz" ${RCLONE_CONF}:${NET_DIR}/$(date +"%m-%d")/ | tee -a "${LOG_DIR}/rclone_$(DATA_FILE_NAME).log" 2>&1
 elif [[ "$1" == "-h" || "$1" == "--help" ]]; then
 	displayHelp
 elif [[ "$1" == "-v" || "$1" == "--version" ]]; then
