@@ -83,15 +83,14 @@ function checkRclone()
 
 function bakComp()
 {
-	logOutputSplit 64 '*'
 	cd "${BASE_ROOT}" || exit
 	source ./user.conf
+	logOutputSplit 64 '*'
 	logOutput "导入用户配置"
 	logOutput "运行脚本： $0"
 	actionShell
 	logOutputSplit 64 '='
-	echo -e | tee -a "${LOG_DIR}/rclone_"${DATA_FILE_NAME}".log" 2>&1 
-
+	echo -e | tee -a "${LOG_DIR}/rclone_'${DATA_FILE_NAME}'.log" 2>&1
 }
 
 
