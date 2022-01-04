@@ -89,13 +89,13 @@ function bak_comp()
 	log_output "运行脚本： $0"
 	action_shell
 	log_output_split 16 '='
-	echo -e | tee -a "${LOG_DIR}/rclone_"${DATA_FILE_NAME}".log" 2>&1
+	echo -e | tee -a "${LOG_DIR}/backupData_"${DATA_FILE_NAME}".log" 2>&1
 }
 
 function push_wx()
 {
 	# cd "${BASE_ROOT}" || exit
-	PUSH_MSG=$(cat "${LOG_DIR}/rclone_"${DATA_FILE_NAME}".log")
+	PUSH_MSG=$(cat "${LOG_DIR}/backupData_"${DATA_FILE_NAME}".log")
 	bash "${BASE_ROOT}"/push.sh "${PUSH_MSG}"
 }
 
