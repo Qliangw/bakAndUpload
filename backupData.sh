@@ -128,7 +128,7 @@ function push_wx()
 	RCLONE_S="$(echo ${TMP_S#*/} | cut -d ',' -f 1)"
 	RCLONE_T="$(echo ${TMP_T#*:})"
 	RCLONE_V="$(echo ${TMP_S#*%,} | cut -d ',' -f 1)"
-	bash "${BASE_ROOT}"/push.sh "文件\t：${RCLONE_F}<br/>体积\t：${RCLONE_S}<br/>速度\t：${RCLONE_V}<br/>用时\t：${RCLONE_T}" "文件\t：${RCLONE_F}\n体积\t：${RCLONE_S}\n速度\t：${RCLONE_V}\n用时\t：${RCLONE_T}\n"
+	bash "${BASE_ROOT}"/push.sh "文件\t：${RCLONE_F}<br/>体积\t：${RCLONE_S}<br/>速度\t：${RCLONE_V}<br/>用时\t：${RCLONE_T}" "文件\t：${RCLONE_F}\n体积\t：${RCLONE_S}\n速度\t：${RCLONE_V}\n用时\t：${RCLONE_T}"
 }
 
 # 帮助文档
@@ -179,4 +179,5 @@ else
 	echo -e "\033[33m请输出-h 查看正确命令！\033[0m"
 fi
 # ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+log_output info "退出脚本"
 exit 0
