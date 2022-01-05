@@ -21,7 +21,7 @@ function log_output()
     #LOG_FORMAT="[${LOG_TYPE}]\t${datetime}\tfuncname:${FUNCNAME[@]} [line:$LINENO]\t${LOG_MSG}"
     #LOG_FORMAT="[${LOG_TYPE}]\t${datetime}\tfuncname: ${FUNCNAME[@]/log/}\t[line:`caller 0 | awk '{print$1}'`]\t${LOG_MSG}"
 	#LOG_FORMAT="${datetime}\t${LOG_TYPE}\t:${FUNCNAME[@]/log/}\t[line:$(caller 0 | awk '{print$1}')]\t${LOG_MSG}"
-	LOG_FORMAT="${datetime}\t${LOG_TYPE}\t[line:$(caller 0 | awk '{print$1}')]\t${LOG_MSG}"
+	LOG_FORMAT="${datetime}\t${LOG_TYPE}\t:${LOG_MSG}"
 	{
 	case $LOG_TYPE in  
                 debug)
@@ -33,7 +33,7 @@ function log_output()
                 error)
                         [[ $LOG_LEVEL -le 3 ]] && echo -e "\033[31m${LOG_FORMAT}\033[0m" ;;
     esac
-	} | tee -a $LOG_FILE
+	} # | tee -a $LOG_FILE
 	#LOG_HEAD_INFO="[$(date '+%H:%M:%S.%3N')]"
 	#echo -e "$LOG_HEAD_INFO" "$1" | tee -a "${LOG_DIR}/backupData_"${DATA_FILE_NAME}".log" 2>&1 
 }
