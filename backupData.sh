@@ -119,12 +119,16 @@ function bak_comp()
 function push_wx()
 {
 	# cd "${BASE_ROOT}" || exit
+	#TMP_F="$(grep -e "[0-9].[0-9]s" "${LOG_DIR}/backupData_"${DATA_FILE_NAME}".log" | tail -1)"
+	TMP_S="$(grep -e "[0-9].[0-9]s" "${LOG_DIR}/backupData_"${DATA_FILE_NAME}".log" | tail -1)"
+	TMP_T="$(grep -e "[0-9].[0-9]s" "${LOG_DIR}/backupData_"${DATA_FILE_NAME}".log" | tail -1)"
+	TMP_V="$(grep -e "[0-9].[0-9]s" "${LOG_DIR}/backupData_"${DATA_FILE_NAME}".log" | tail -1)"
 	PUSH_MSG=$(cat "${LOG_DIR}/backupData_"${DATA_FILE_NAME}".log")
 	RCLONE_F="bak_appdata_"${DATA_FILE_NAME}".tar.gz"
-	RCLONE_S=""
-	RCLONE_T=""
-	RCLONE_V=""
-	bash "${BASE_ROOT}"/push.sh "${PUSH_MSG}" "文件\t：${RCLONE_F}\n体积\t：${RCLONE_S}\n速度\t：${RCLONE_V}\n用时\t：${RCLONE_T}\n"
+	RCLONE_S="$(echo ${TMP_S#*/} | cut -d ',' -f 1)"
+	RCLONE_T="$(echo ${TMP_T#*:})"
+	RCLONE_V="$(echo ${TMP_S#*%,} | cut -d ',' -f 1)"
+	bash "${BASE_ROOT}"/push.sh "文件\t：${RCLONE_F}\<br\/\>体积\t：${RCLONE_S}\<br\/\>速度\t：${RCLONE_V}\<br\/\>用时\t：${RCLONE_T}\<br\/\>" "文件\t：${RCLONE_F}\n体积\t：${RCLONE_S}\n速度\t：${RCLONE_V}\n用时\t：${RCLONE_T}\n"
 }
 
 # 帮助文档
@@ -160,7 +164,9 @@ if [[ "$1" == "-m" || "$1" == "manual" ]]; then
 elif [[ "$1" == "-a" || "$1" == "auto" ]]; then
 	bak_comp
 	# log_output_split 10 '-'
+	log_output info "开始上传..."
 	rclone copy -v "${BAK_ROOT_DIR}/bak_appdata_"${DATA_FILE_NAME}".tar.gz" "${RCLONE_CONF}":"${NET_DIR}"/"$(date +'%m-%d')" >> "${LOG_DIR}/backupData_"${DATA_FILE_NAME}".log" 2>&1
+	log_output info "完成上传，推送信息中..."
 	push_wx
 elif [[ "$1" == "-h" || "$1" == "--help" ]]; then
 	display_help
