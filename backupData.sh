@@ -80,10 +80,10 @@ function comp_file()
 function action_shell()
 {
 	if [ -f "${BAK_ROOT_DIR}/bak_appdata_"${DATA_FILE_NAME}".tar.gz" ];then
-		log_output info "今日已备份！" 
+		log_output warn "今日已备份！" 
 	else
 		if [ -d "${BAK_ROOT_DIR}/bak_appdata_"${DATA_FILE_NAME}"" ];then
-		    log_output info "本次备份目录已存在" 
+		    log_output warn "本次备份目录已存在" 
 		else
 		    create_dir
 		    action_backup
