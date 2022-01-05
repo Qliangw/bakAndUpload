@@ -88,7 +88,7 @@ This is a backup script that automatically compresses, encrypts and uploads to a
 
 ## 免责声明
 
-- 本项目遵守[MIT License](https://github.com/JunzhouLiu/BILIBILI-HELPER-PRE/blob/main/LICENSE)，因使用造成的任何损失，纠纷等，和开发者无关，请各位知悉。
+- 本项目遵守[MIT License](https://github.com/Qliangw/bakAndUpload/blob/v0.0.1/LICENSE)，因使用造成的任何损失，纠纷等，和开发者无关，请各位知悉。
 
 ## 鸣谢
 
