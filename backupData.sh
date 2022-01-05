@@ -71,10 +71,10 @@ function comp_file()
 	# tar -zc 使用gzip压缩
 	# 解压命令：openssl des3 -d -k password -salt -in files.tar.gz | tar xzvf -
 	# 压缩 删除原文件 加密 以日期命名
-	tar -czvf - "${BAK_DIR}" --remove-files \
+	tar -czf - "${BAK_DIR}" --remove-files \
 		| openssl des3 -salt -k password \
-		| dd of=bak_appdata_"$(date +'%Y-%m-%d')".tar.gz \
-		| tee -a "${LOG_DIR}/backupData_"${DATA_FILE_NAME}".log" 2>&1
+		| dd of=bak_appdata_"$(date +'%Y-%m-%d')".tar.gz 
+		# | tee -a "${LOG_DIR}/backupData_"${DATA_FILE_NAME}".log" 2>&1
 	log_output info "加密压缩完成！" 
 }
 
@@ -128,9 +128,10 @@ function push_wx()
 	RCLONE_S="$(echo ${TMP_S#*/} | cut -d ',' -f 1)"
 	RCLONE_T="$(echo ${TMP_T#*:})"
 	RCLONE_V="$(echo ${TMP_S#*%,} | cut -d ',' -f 1)"
-	PUSH_MSG="文件名称\t：${RCLONE_F}\n忽略文件\t："$(echo ${IGNORE_DIR} | sed 's/\\|/,/g')"\n文件大小\t：${RCLONE_S}\n平均速度\t：${RCLONE_V}\n上传用时\t：${RCLONE_T}"
-	PUSH_DES="$(echo "$PUSH_MSG" | sed 's/\\n/\<br\/\>/g')"
-	bash "${BASE_ROOT}"/push.sh "${PUSH_DES}" "${PUSH_MSG}"
+	PUSH_DIGEST="文件名称\t：${RCLONE_F}\n忽略文件\t："$(echo ${IGNORE_DIR} | sed 's/\\|/,/g')"\n文件大小\t：${RCLONE_S}\n平均速度\t：${RCLONE_V}\n上传用时\t：${RCLONE_T}"
+	PUSH_CONTENT="$(echo "$PUSH_DIGEST" | sed 's/\\n/\<br\/\>/g')"
+	# push 参数1(html格式) 参数2(文本格式)
+	bash "${BASE_ROOT}"/push.sh "${PUSH_CONTENT}" "${PUSH_DIGEST}"
 }
 
 # 帮助文档
