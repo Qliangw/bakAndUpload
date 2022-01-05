@@ -123,12 +123,14 @@ function push_wx()
 	TMP_S="$(grep -e "[0-9]*.[0-9]* MiB/s" "${LOG_DIR}/backupData_"${DATA_FILE_NAME}".log" | tail -1)"
 	TMP_T="$(grep -e "[0-9].[0-9]s" "${LOG_DIR}/backupData_"${DATA_FILE_NAME}".log" | tail -1)"
 	#TMP_V="$(grep -e "[0-9].[0-9]s" "${LOG_DIR}/backupData_"${DATA_FILE_NAME}".log" | tail -1)"
-	PUSH_MSG=$(cat "${LOG_DIR}/backupData_"${DATA_FILE_NAME}".log")
+	#PUSH_MSG=$(cat "${LOG_DIR}/backupData_"${DATA_FILE_NAME}".log")
 	RCLONE_F="bak_appdata_"${DATA_FILE_NAME}".tar.gz"
 	RCLONE_S="$(echo ${TMP_S#*/} | cut -d ',' -f 1)"
 	RCLONE_T="$(echo ${TMP_T#*:})"
 	RCLONE_V="$(echo ${TMP_S#*%,} | cut -d ',' -f 1)"
-	bash "${BASE_ROOT}"/push.sh "文件\t：${RCLONE_F}<br/>体积\t：${RCLONE_S}<br/>速度\t：${RCLONE_V}<br/>用时\t：${RCLONE_T}" "文件\t：${RCLONE_F}\n体积\t：${RCLONE_S}\n速度\t：${RCLONE_V}\n用时\t：${RCLONE_T}"
+	PUSH_MSG="文件名称\t：${RCLONE_F}\n忽略文件\t:${IGNORE_DIR}文件大小\t：${RCLONE_S}\n平均速度\t：${RCLONE_V}\n上传用时\t：${RCLONE_T}"
+	PUSH_DES="$(echo "$PUSH_MSG" | sed 's/\\n/\<br\/\>/g')"
+	bash "${BASE_ROOT}"/push.sh "${PUSH_DES}" "${PUSH_MSG}"
 }
 
 # 帮助文档
