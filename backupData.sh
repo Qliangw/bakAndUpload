@@ -12,7 +12,7 @@ DATA_FILE_NAME=$(date '+%F')
 # ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 function log_output()
 {
-	LOG_HEAD_INFO="[$(date '+%F %H:%M:%S.%3N')]"
+	LOG_HEAD_INFO="$(date '+%Y/%m/%d %H:%M:%S INFO')"
 	#LOG_HEAD_INFO="[$(date '+%H:%M:%S.%3N')]"
 	echo -e "$LOG_HEAD_INFO" "$1" | tee -a "${LOG_DIR}/backupData_"${DATA_FILE_NAME}".log" 2>&1 
 }
