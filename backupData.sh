@@ -120,7 +120,11 @@ function push_wx()
 {
 	# cd "${BASE_ROOT}" || exit
 	PUSH_MSG=$(cat "${LOG_DIR}/backupData_"${DATA_FILE_NAME}".log")
-	bash "${BASE_ROOT}"/push.sh "${PUSH_MSG}" "待添加\n内容为rclone上传日志"
+	RCLONE_F="$(bak_appdata_"${DATA_FILE_NAME}".tar.gz")"
+	RCLONE_S=""
+	RCLONE_T=""
+	RCLONE_V=""
+	bash "${BASE_ROOT}"/push.sh "${PUSH_MSG}" "文件\t：${RCLONE_F}\n体积\t：${RCLONE_S}\n速度\t：${RCLONE_V}\n用时\t：${RCLONE_T}\n"
 }
 
 # 帮助文档
