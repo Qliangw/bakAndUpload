@@ -120,7 +120,7 @@ function push_wx()
 {
 	# cd "${BASE_ROOT}" || exit
 	PUSH_MSG=$(cat "${LOG_DIR}/backupData_"${DATA_FILE_NAME}".log")
-	RCLONE_F="$(bak_appdata_"${DATA_FILE_NAME}".tar.gz")"
+	RCLONE_F="bak_appdata_"${DATA_FILE_NAME}".tar.gz"
 	RCLONE_S=""
 	RCLONE_T=""
 	RCLONE_V=""
