@@ -1,7 +1,7 @@
 #!/bin/sh
 
 path=$(cd `dirname $0` || exit;pwd)
-source user.conf
+#source user.conf
 # get key
 RET=$(curl -s https://qyapi.weixin.qq.com/cgi-bin/gettoken?"corpid="${CORPID}"&corpsecret="${CORP_SECRET}"")
 KEY=$(echo ${RET} | jq -r .access_token)
