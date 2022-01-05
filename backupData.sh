@@ -10,11 +10,33 @@ DATA_FILE_NAME=$(date '+%F')
 
 # *****************2. 函数*****************
 # ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+#设置日志级别
+loglevel=0 #debug:0; info:1; warn:2; error:3
+logfile="${LOG_DIR}/backupData_"${DATA_FILE_NAME}".log"
 function log_output()
 {
-	LOG_HEAD_INFO="$(date '+%Y/%m/%d %H:%M:%S INFO')"
+	local msg;local logtype
+	logtype="$1"
+	msg="$2"
+	datetime=$(date +'%Y/%m/%d %H:%M:%S')
+	#使用内置变量$LINENO不行，不能显示调用那一行行号
+    #logformat="[${logtype}]\t${datetime}\tfuncname:${FUNCNAME[@]} [line:$LINENO]\t${msg}"
+    #logformat="[${logtype}]\t${datetime}\tfuncname: ${FUNCNAME[@]/log/}\t[line:`caller 0 | awk '{print$1}'`]\t${msg}"
+	logformat="${datetime}\t${logtype}\t:${FUNCNAME[@]/log/}\t[line:$(caller 0 | awk '{print$1}')]\t${msg}"
+	{
+	case $logtype in  
+                debug)
+                        [[ $loglevel -le 0 ]] && echo -e "\033[30m${logformat}\033[0m" ;;
+                info)
+                        [[ $loglevel -le 1 ]] && echo -e "\033[32m${logformat}\033[0m" ;;
+                warn)
+                        [[ $loglevel -le 2 ]] && echo -e "\033[33m${logformat}\033[0m" ;;
+                error)
+                        [[ $loglevel -le 3 ]] && echo -e "\033[31m${logformat}\033[0m" ;;
+    esac
+	} | tee -a $logfile
 	#LOG_HEAD_INFO="[$(date '+%H:%M:%S.%3N')]"
-	echo -e "$LOG_HEAD_INFO" "$1" | tee -a "${LOG_DIR}/backupData_"${DATA_FILE_NAME}".log" 2>&1 
+	#echo -e "$LOG_HEAD_INFO" "$1" | tee -a "${LOG_DIR}/backupData_"${DATA_FILE_NAME}".log" 2>&1 
 }
 
 function log_output_split()
@@ -26,23 +48,23 @@ function log_output_split()
 function action_backup()
 {
 	cd "${DATA_DIR}" || exit
-	log_output "开始备份appdata数据..." 
+	log_output info "开始备份appdata数据..." 
 	cp -r $(ls "${DATA_DIR}" | grep -v "${IGNORE_DIR}" | xargs) "${BAK_DIR}"
-	log_output "备份appdata数据完成！" 
+	log_output info "备份appdata数据完成！" 
 }
 
 function create_dir()
 {
-	log_output "本次备份目录不存在" 
+	log_output info "本次备份目录不存在" 
     mkdir "${BAK_ROOT_DIR}"/bak_appdata_"${DATA_FILE_NAME}"
-    log_output "创建bak_appdata目录" 
+    log_output info "创建bak_appdata目录" 
 }
 
 function comp_file()
 {
 	# 进入备份目录的上一级目录
 	cd "${BAK_ROOT_DIR}" || exit
-	log_output "开始压缩appdata备份数据..." 
+	log_output info "开始压缩appdata备份数据..." 
 	
 	# zip 压缩
 	# zip -rmP password unraid_appdata_bak_$(date +"%Y-%m-%d").zip "${BAK_DIR}"
@@ -50,20 +72,20 @@ function comp_file()
 	# tar -zc 使用gzip压缩
 	# 解压命令：openssl des3 -d -k password -salt -in files.tar.gz | tar xzvf -
 	# 压缩 删除原文件 加密 以日期命名
-	tar -czf - "${BAK_DIR}" --remove-files \
+	tar -czvf - "${BAK_DIR}" --remove-files \
 		| openssl des3 -salt -k password \
 		| dd of=bak_appdata_"$(date +'%Y-%m-%d')".tar.gz \
-		| tee -a "${LOG_DIR}/rclone_"${DATA_FILE_NAME}".log" 2>&1
-	log_output "加密压缩完成！" 
+		| tee -a "${LOG_DIR}/backupData_"${DATA_FILE_NAME}".log" 2>&1
+	log_output info "加密压缩完成！" 
 }
 
 function action_shell()
 {
 	if [ -f "${BAK_ROOT_DIR}/bak_appdata_"${DATA_FILE_NAME}".tar.gz" ];then
-		log_output "今日已备份！" 
+		log_output info "今日已备份！" 
 	else
 		if [ -d "${BAK_ROOT_DIR}/bak_appdata_"${DATA_FILE_NAME}"" ];then
-		    log_output "本次备份目录已存在" 
+		    log_output info "本次备份目录已存在" 
 		else
 		    create_dir
 		    action_backup
@@ -75,7 +97,7 @@ function action_shell()
 function check_rclone()
 {
 	if ! [ -x "$(command -v rclone)" ];then
-		log_output "rclone未安装"
+		log_output info "rclone未安装"
 		exit 1
 	fi
 }
@@ -84,11 +106,11 @@ function bak_comp()
 {
 	cd "${BASE_ROOT}" || exit
 	source ./user.conf
-	# log_output_split 16 '*'
-	log_output "导入用户配置"
-	log_output "运行脚本： $0"
+	#log_output_split 32 '*'
+	log_output info "导入用户配置"
+	log_output info "运行脚本： $0"
 	action_shell
-	# log_output_split 16 '='
+	#log_output_split 32 '-'
 	echo -e | tee -a "${LOG_DIR}/backupData_"${DATA_FILE_NAME}".log" 2>&1
 }
 
