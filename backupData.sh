@@ -10,31 +10,29 @@ DATA_FILE_NAME=$(date '+%F')
 
 # *****************2. 函数*****************
 # ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
-#设置日志级别
-loglevel=0 #debug:0; info:1; warn:2; error:3
-logfile="${LOG_DIR}/backupData_"${DATA_FILE_NAME}".log"
+
 function log_output()
 {
-	local msg;local logtype
-	logtype="$1"
-	msg="$2"
+	local LOG_MSG;local LOG_TYPE
+	LOG_TYPE="$1"
+	LOG_MSG="$2"
 	datetime=$(date +'%Y/%m/%d %H:%M:%S')
 	#使用内置变量$LINENO不行，不能显示调用那一行行号
-    #logformat="[${logtype}]\t${datetime}\tfuncname:${FUNCNAME[@]} [line:$LINENO]\t${msg}"
-    #logformat="[${logtype}]\t${datetime}\tfuncname: ${FUNCNAME[@]/log/}\t[line:`caller 0 | awk '{print$1}'`]\t${msg}"
-	logformat="${datetime}\t${logtype}\t:${FUNCNAME[@]/log/}\t[line:$(caller 0 | awk '{print$1}')]\t${msg}"
+    #LOG_FORMAT="[${LOG_TYPE}]\t${datetime}\tfuncname:${FUNCNAME[@]} [line:$LINENO]\t${LOG_MSG}"
+    #LOG_FORMAT="[${LOG_TYPE}]\t${datetime}\tfuncname: ${FUNCNAME[@]/log/}\t[line:`caller 0 | awk '{print$1}'`]\t${LOG_MSG}"
+	LOG_FORMAT="${datetime}\t${LOG_TYPE}\t:${FUNCNAME[@]/log/}\t[line:$(caller 0 | awk '{print$1}')]\t${LOG_MSG}"
 	{
-	case $logtype in  
+	case $LOG_TYPE in  
                 debug)
-                        [[ $loglevel -le 0 ]] && echo -e "\033[30m${logformat}\033[0m" ;;
+                        [[ $LOG_LEVEL -le 0 ]] && echo -e "\033[30m${LOG_FORMAT}\033[0m" ;;
                 info)
-                        [[ $loglevel -le 1 ]] && echo -e "\033[32m${logformat}\033[0m" ;;
+                        [[ $LOG_LEVEL -le 1 ]] && echo -e "\033[32m${LOG_FORMAT}\033[0m" ;;
                 warn)
-                        [[ $loglevel -le 2 ]] && echo -e "\033[33m${logformat}\033[0m" ;;
+                        [[ $LOG_LEVEL -le 2 ]] && echo -e "\033[33m${LOG_FORMAT}\033[0m" ;;
                 error)
-                        [[ $loglevel -le 3 ]] && echo -e "\033[31m${logformat}\033[0m" ;;
+                        [[ $LOG_LEVEL -le 3 ]] && echo -e "\033[31m${LOG_FORMAT}\033[0m" ;;
     esac
-	} | tee -a $logfile
+	} | tee -a $LOG_FILE
 	#LOG_HEAD_INFO="[$(date '+%H:%M:%S.%3N')]"
 	#echo -e "$LOG_HEAD_INFO" "$1" | tee -a "${LOG_DIR}/backupData_"${DATA_FILE_NAME}".log" 2>&1 
 }
@@ -97,7 +95,7 @@ function action_shell()
 function check_rclone()
 {
 	if ! [ -x "$(command -v rclone)" ];then
-		log_output info "rclone未安装"
+		log_output error "rclone未安装"
 		exit 1
 	fi
 }
@@ -106,12 +104,15 @@ function bak_comp()
 {
 	cd "${BASE_ROOT}" || exit
 	source ./user.conf
+	#设置日志级别
+	LOG_LEVEL=1 #debug:0; info:1; warn:2; error:3
+	LOG_FILE="${LOG_DIR}/backupData_"${DATA_FILE_NAME}".log"
 	#log_output_split 32 '*'
 	log_output info "导入用户配置"
 	log_output info "运行脚本： $0"
 	action_shell
 	#log_output_split 32 '-'
-	echo -e | tee -a "${LOG_DIR}/backupData_"${DATA_FILE_NAME}".log" 2>&1
+	#echo -e | tee -a "${LOG_DIR}/backupData_"${DATA_FILE_NAME}".log" 2>&1
 }
 
 function push_wx()
@@ -163,7 +164,8 @@ elif [[ "$1" == "-v" || "$1" == "--version" ]]; then
 elif [[ "$1" == "test" ]]; then
 	push_wx
 else
-	echo "请输出-h 查看正确命令！"
+	#echo "请输出-h 查看正确命令！"
+	echo -e "\033[33m请输出-h 查看正确命令！\033[0m"
 fi
 # ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
 exit 0
