@@ -20,7 +20,8 @@ function log_output()
 	#使用内置变量$LINENO不行，不能显示调用那一行行号
     #LOG_FORMAT="[${LOG_TYPE}]\t${datetime}\tfuncname:${FUNCNAME[@]} [line:$LINENO]\t${LOG_MSG}"
     #LOG_FORMAT="[${LOG_TYPE}]\t${datetime}\tfuncname: ${FUNCNAME[@]/log/}\t[line:`caller 0 | awk '{print$1}'`]\t${LOG_MSG}"
-	LOG_FORMAT="${datetime}\t${LOG_TYPE}\t:${FUNCNAME[@]/log/}\t[line:$(caller 0 | awk '{print$1}')]\t${LOG_MSG}"
+	#LOG_FORMAT="${datetime}\t${LOG_TYPE}\t:${FUNCNAME[@]/log/}\t[line:$(caller 0 | awk '{print$1}')]\t${LOG_MSG}"
+	LOG_FORMAT="${datetime}\t${LOG_TYPE}\t[line:$(caller 0 | awk '{print$1}')]\t${LOG_MSG}"
 	{
 	case $LOG_TYPE in  
                 debug)
