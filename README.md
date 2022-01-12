@@ -51,40 +51,9 @@ This is a backup script that automatically compresses, encrypts and uploads to a
 1. 自动模式，默认每天运行一次，检测到已备份后跳过
 2. 手动模式，还没开始搞（目前仅仅备份至本地）
 
-### 使用方法
+### [使用方法](https://github.com/Qliangw/bakAndUpload/wiki#%E4%BD%BF%E7%94%A8)
 
-1. [配置rclone](https://p3terx.com/archives/rclone-installation-and-configuration-tutorial.html)
-
-2. 安装jq
-
-   1. ubuntu安装 `sudo apt-get install jq`
-
-   2.   [centos参考](https://www.jianshu.com/p/a540d121e651) 
-
-      ```bash
-      wget https://github.com/stedolan/jq/releases/download/jq-1.5/jq-1.5.tar.gz
-      tar -xzvf jq-1.5.tar.gz 
-      cd jq-1.5/
-      ./configure && make && sudo make install
-      ```
-
-3. 将本脚本clone至本地 `git clone https://github.com/Qliangw/bakAndUpload.git`
-4. 进入到bakAndUpload目录复制用户配置文件 `cp user.conf.default user.conf`
-5. 根据配置说明完成配置
-   1. 企业微信通知参考
-6. 测试 `bash bakAndUpload.sh -a`
-7. 添加定时任务
-
----------
-
-> 准备增加的功能
->
-> - [x] 黑名单模式
-> - [ ] 白名单模式
-> - [x] 完成后推送通知
->   - 备份的内容
->   - 文件夹大小
->   - 文件名称
+## [功能](https://github.com/Qliangw/bakAndUpload/wiki#%E5%8A%9F%E8%83%BD)
 
 ## 免责声明
 
