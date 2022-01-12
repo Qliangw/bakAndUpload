@@ -5,8 +5,17 @@ export LOG_DIR=/mnt/user/optfiles/logs
 
 # 需要备份的目录
 export DATA_DIR=/mnt/user/appdata
-# 忽略的目录，如果忽略多个改为'plex\|emby\|tr....',分别用\|隔开即可
-export IGNORE_DIR='plex\|emby'
+
+# 备份模式选择 Whitelist/Blacklist，
+# 填写 'w'或者'1'为白名单，'2'或者'b' 为黑名单，无关大小写
+export BAK_MODE="b"
+
+# 白名单 
+export SLECT_DIR="gitlab,flexget,qb,tr"
+
+# 黑名单，此处不备份
+# 忽略的目录，如果忽略多个改为'plex,emby',分别用英文状态下的逗号,隔开即可
+export IGNORE_DIR="plex,emby"
 
 # /mnt/user/optfiles 这里要更换为你新建的备份文件
 export BAK_ROOT_DIR=/mnt/user/optfiles/backup
@@ -15,7 +24,6 @@ export BAK_DIR="$BAK_ROOT_DIR/bak_appdata_$(date '+%F')"
 ##########################
 # 2. 压缩密码
 export TAR_PASSWD=abcd1234
-
 
 ##########################
 # 3. rclone配置
@@ -30,3 +38,11 @@ export CORP_SECRET=""
 export AGENTID=""
 export MEDIA_ID=""
 export TOUSER="@all"
+
+##########################
+# 5. 清理冗余
+# 时间格式 "d"对应天，"m"对应月
+# 默认本地保留一周，云盘保留半年
+export LOCAL_BAK_DAY="7d"
+export CLOUD_BAK_TIME="6m"
+export LOG_TIME="6m"
