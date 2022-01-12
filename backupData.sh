@@ -18,8 +18,8 @@ function log_output()
 	LOG_MSG="$2"
 	datetime=$(date +'%Y/%m/%d %H:%M:%S')
 	#使用内置变量$LINENO不行，不能显示调用那一行行号
-    #LOG_FORMAT="[${LOG_TYPE}]\t${datetime}\tfuncname:${FUNCNAME[@]} [line:$LINENO]\t${LOG_MSG}"
-    #LOG_FORMAT="[${LOG_TYPE}]\t${datetime}\tfuncname: ${FUNCNAME[@]/log/}\t[line:`caller 0 | awk '{print$1}'`]\t${LOG_MSG}"
+	#LOG_FORMAT="[${LOG_TYPE}]\t${datetime}\tfuncname:${FUNCNAME[@]} [line:$LINENO]\t${LOG_MSG}"
+	#LOG_FORMAT="[${LOG_TYPE}]\t${datetime}\tfuncname: ${FUNCNAME[@]/log/}\t[line:`caller 0 | awk '{print$1}'`]\t${LOG_MSG}"
 	#LOG_FORMAT="${datetime}\t${LOG_TYPE}\t:${FUNCNAME[@]/log/}\t[line:$(caller 0 | awk '{print$1}')]\t${LOG_MSG}"
 	LOG_FORMAT="${datetime}\t${LOG_TYPE}\t:${LOG_MSG}"
 	{
@@ -48,15 +48,21 @@ function action_backup()
 {
 	cd "${DATA_DIR}" || exit
 	log_output info "开始备份appdata数据..." 
-	cp -r $(ls "${DATA_DIR}" | grep -v "${IGNORE_DIR}" | xargs) "${BAK_DIR}"
+	IGNORE_DIR_FINAL=$(echo ${IGNORE_DIR: -1})
+	if [[ "${IGNORE_DIR_FINAL}" == "," ]]; then
+		IGNORE_DIR_TRANSFORM=$(echo ${IGNORE_DIR%?} | sed 's/,/\\|/g')
+	else
+		IGNORE_DIR_TRANSFORM=$(echo ${IGNORE_DIR} | sed 's/,/\\|/g')
+	fi
+	cp -r $(ls "${DATA_DIR}" | grep -v "${IGNORE_DIR_TRANSFORM}" | xargs) "${BAK_DIR}"
 	log_output info "备份appdata数据完成！" 
 }
 
 function create_dir()
 {
 	log_output info "本次备份目录不存在" 
-    mkdir "${BAK_ROOT_DIR}"/bak_appdata_"${DATA_FILE_NAME}"
-    log_output info "创建bak_appdata目录" 
+	mkdir "${BAK_ROOT_DIR}"/bak_appdata_"${DATA_FILE_NAME}"
+	log_output info "创建bak_appdata目录" 
 }
 
 function comp_file()
@@ -128,7 +134,12 @@ function push_wx()
 	RCLONE_S="$(echo ${TMP_S#*/} | cut -d ',' -f 1)"
 	RCLONE_T="$(echo ${TMP_T#*:})"
 	RCLONE_V="$(echo ${TMP_S#*%,} | cut -d ',' -f 1)"
-	PUSH_DIGEST="文件名称\t：${RCLONE_F}\n忽略文件\t："$(echo ${IGNORE_DIR} | sed 's/\\|/,/g')"\n文件大小\t：${RCLONE_S}\n平均速度\t：${RCLONE_V}\n上传用时\t：${RCLONE_T}"
+	if [[ $(echo ${IGNORE_DIR: -1}) == "," ]]; then
+		IGNORE_DIR_PUSH=$(echo "${IGNORE_DIR%?}")
+	else
+		IGNORE_DIR_PUSH=${IGNORE_DIR}
+	fi
+	PUSH_DIGEST="文件名称\t：${RCLONE_F}\n忽略文件\t："${IGNORE_DIR_PUSH}"\n文件大小\t：${RCLONE_S}\n平均速度\t：${RCLONE_V}\n上传用时\t：${RCLONE_T}"
 	PUSH_CONTENT="$(echo "$PUSH_DIGEST" | sed 's/\\n/\<br\/\>/g')"
 	# push 参数1(html格式) 参数2(文本格式)
 	bash "${BASE_ROOT}"/push.sh "${PUSH_CONTENT}" "${PUSH_DIGEST}"
@@ -139,17 +150,17 @@ display_help()
 {
 	echo "Usage: $0 [option...] {manual|auto}" >&2
 	echo "   -m, manual              手动模式"
-    echo "   -a, auto                自动模式"
-    echo "   -v, --version           版本信息"
-    echo "   -h, --help              帮助信息"
-    echo
+	echo "   -a, auto                自动模式"
+	echo "   -v, --version           版本信息"
+	echo "   -h, --help              帮助信息"
+	echo
     # echo some stuff here for the -a or --add-options 
     exit 1
 }
 
 version()
 {
-	echo -e "version:0.0.1"\\nupdate time:2021-12-31
+	echo -e "version:0.0.2"\\nupdate time:2022-01-12
 }
 
 # rclone copy -v "${BAK_ROOT_DIR}/bak_appdata_"${DATA_FILE_NAME}".tar.gz" aliyunwebdav-zx:/webdav/backup/unraid/$(date +"%m-%d")/ > "/mnt/disk1/rclone-tr.log" 2>&1
