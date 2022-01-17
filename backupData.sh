@@ -1,5 +1,8 @@
 #!/bin/bash
 
+versionX="0.1.1"
+updateX="2022-01-17"
+
 # *****************1. 配置*****************
 # ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 BASE_ROOT=$(cd "$(dirname "$0")" || exit;pwd)
@@ -99,12 +102,15 @@ function action_shell()
 	fi
 }
 
-function check_rclone()
+function start_rclone()
 {
 	if ! [ -x "$(command -v rclone)" ];then
-		log_output error "rclone未安装"
+		log_output error "rclone未安装,仅备份至本地"
 		exit 1
 	fi
+	log_output info "开始上传..."
+	rclone copy -v "${BAK_ROOT_DIR}/bak_appdata_"${DATA_FILE_NAME}".tar.gz" "${RCLONE_CONF}":"${NET_DIR}"/"$(date +'%m-%d')" >> "${LOG_DIR}/backupData_"${DATA_FILE_NAME}".log" 2>&1
+	log_output info "完成上传!"
 }
 
 function bak_comp()
@@ -122,8 +128,19 @@ function bak_comp()
 	#echo -e | tee -a "${LOG_DIR}/backupData_"${DATA_FILE_NAME}".log" 2>&1
 }
 
+# 删除旧备份
+function rm_oldbak()
+{
+	log_output info "开始清理旧文件..."
+	find "${BAK_DIR}" -mtime "+${LOCAL_BAK_DAY}"  -name "*.tar.gz"  -type f -print -exec rm -rf {} \;
+	find "${LOG_DIR}" -mtime "+${LOG_TIME}"  -name "*.tar.gz"  -type f -print -exec rm -rf {} \;
+	log_output info "清理完成！"
+}
+
 function push_wx()
 {
+	log_output info "推送信息中..."
+
 	# cd "${BASE_ROOT}" || exit
 	#TMP_F="$(grep -e "[0-9].[0-9]s" "${LOG_DIR}/backupData_"${DATA_FILE_NAME}".log" | tail -1)"
 	TMP_S="$(grep -e "[0-9]*.[0-9]* MiB/s" "${LOG_DIR}/backupData_"${DATA_FILE_NAME}".log" | tail -1)"
@@ -154,13 +171,14 @@ display_help()
 	echo "   -v, --version           版本信息"
 	echo "   -h, --help              帮助信息"
 	echo
-    # echo some stuff here for the -a or --add-options 
-    exit 1
+	# echo some stuff here for the -a or --add-options 
+	exit 0
 }
 
 version()
 {
-	echo -e "version:0.0.2"\\nupdate time:2022-01-12
+	echo -e "--Version:${versionX}" "\\n--update time:${updateX}"
+	exit 0
 }
 
 # rclone copy -v "${BAK_ROOT_DIR}/bak_appdata_"${DATA_FILE_NAME}".tar.gz" aliyunwebdav-zx:/webdav/backup/unraid/$(date +"%m-%d")/ > "/mnt/disk1/rclone-tr.log" 2>&1
@@ -177,10 +195,8 @@ if [[ "$1" == "-m" || "$1" == "manual" ]]; then
 	bak_comp
 elif [[ "$1" == "-a" || "$1" == "auto" ]]; then
 	bak_comp
-	# log_output_split 10 '-'
-	log_output info "开始上传..."
-	rclone copy -v "${BAK_ROOT_DIR}/bak_appdata_"${DATA_FILE_NAME}".tar.gz" "${RCLONE_CONF}":"${NET_DIR}"/"$(date +'%m-%d')" >> "${LOG_DIR}/backupData_"${DATA_FILE_NAME}".log" 2>&1
-	log_output info "完成上传，推送信息中..."
+	rm_oldbak
+	start_rclone
 	push_wx
 elif [[ "$1" == "-h" || "$1" == "--help" ]]; then
 	display_help
