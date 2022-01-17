@@ -41,8 +41,7 @@ export TOUSER="@all"
 
 ##########################
 # 5. 清理冗余
-# 时间格式 "d"对应天，"m"对应月
 # 默认本地保留一周，云盘保留半年
-export LOCAL_BAK_DAY="7d"
-export CLOUD_BAK_TIME="6m"
-export LOG_TIME="6m"
+export LOCAL_BAK_DAY="7"
+export CLOUD_BAK_DAY="180"
+export LOG_DAY="180"
