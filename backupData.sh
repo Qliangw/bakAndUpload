@@ -132,8 +132,10 @@ function bak_comp()
 function rm_oldbak()
 {
 	log_output info "开始清理旧文件..."
-	find "${BAK_DIR}" -mtime "+${LOCAL_BAK_DAY}"  -name "*.tar.gz"  -type f -print -exec rm -rf {} \;
-	find "${LOG_DIR}" -mtime "+${LOG_TIME}"  -name "*.tar.gz"  -type f -print -exec rm -rf {} \;
+	log_output info "清理${LOCAL_BAK_DAY}天以上的备份"
+	find "${BAK_ROOT_DIR}" -mtime +${LOCAL_BAK_DAY} -name "*.tar.gz"  -type f -print -exec rm -rf {} \;
+	log_output info "清理${LOG_DAY}天以上的日志"
+	find "${LOG_DIR}" -mtime +${LOG_DAY} -name "*.log"  -type f -print -exec rm -rf {} \;
 	log_output info "清理完成！"
 }
 
