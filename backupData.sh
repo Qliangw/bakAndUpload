@@ -81,7 +81,7 @@ function comp_file()
 	# 解压命令：openssl des3 -d -k password -salt -in files.tar.gz | tar xzvf -
 	# 压缩 删除原文件 加密 以日期命名
 	tar -czf - "${BAK_DIR}" --remove-files \
-		| openssl des3 -salt -k password \
+		| openssl des3 -salt -k "${TAR_PASSWD}" \
 		| dd of=bak_appdata_"$(date +'%Y-%m-%d')".tar.gz 
 		# | tee -a "${LOG_DIR}/backupData_"${DATA_FILE_NAME}".log" 2>&1
 	log_output info "加密压缩完成！" 
