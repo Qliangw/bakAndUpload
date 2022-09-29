@@ -4,6 +4,8 @@
 
 ## 脚本说明
 
+**告诉大家一个好用的备份工具，可以去尝试一下 [docker-duplicati](https://github.com/linuxserver/docker-duplicati)，配合 [alist](https://github.com/alist-org/alist)上传至阿里网盘等非常方便**
+
 这是一个备份脚本，实现自动压缩加密并上传至网盘。
 
 This is a backup script that automatically compresses, encrypts and uploads to a network drive.
