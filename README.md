@@ -2,9 +2,15 @@
 
 [TOC]
 
-## 脚本说明
+**咕咕了这么久，还是没有时间去维护，给大家道歉，但被群友推荐了个新工具，或许满足大家备份的要求，可以去试用。该脚本暂停更新了**
 
 **告诉大家一个好用的备份工具，可以去尝试一下 [docker-duplicati](https://github.com/linuxserver/docker-duplicati)，配合 [alist](https://github.com/alist-org/alist)上传至阿里网盘等非常方便**
+
+**告诉大家一个好用的备份工具，可以去尝试一下 [docker-duplicati](https://github.com/linuxserver/docker-duplicati)，配合 [alist](https://github.com/alist-org/alist)上传至阿里网盘等非常方便**
+
+**告诉大家一个好用的备份工具，可以去尝试一下 [docker-duplicati](https://github.com/linuxserver/docker-duplicati)，配合 [alist](https://github.com/alist-org/alist)上传至阿里网盘等非常方便**
+
+## 脚本说明
 
 这是一个备份脚本，实现自动压缩加密并上传至网盘。
 
